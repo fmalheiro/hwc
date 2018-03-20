@@ -3,6 +3,7 @@ package hwcconfig
 import (
 	"os"
 	"path/filepath"
+	"io/ioutil"
 )
 
 type HwcConfig struct {
@@ -18,7 +19,7 @@ type HwcConfig struct {
 	ApplicationHostConfigPath string
 }
 
-func New(port int, rootPath, tmpPath, contextPath, uuid string) (error, *HwcConfig) {
+func New(port int, rootPath, tmpPath, contextPath, uuid string, multipleApps bool) (error, *HwcConfig) {
 	config := &HwcConfig{
 		Instance:                      uuid,
 		Port:                          port,
@@ -49,7 +50,21 @@ func New(port int, rootPath, tmpPath, contextPath, uuid string) (error, *HwcConf
 		return err, nil
 	}
 
-	config.Applications = NewHwcApplications(defaultRootPath, rootPath, contextPath)
+	if multipleApps == false {
+		config.Applications = NewHwcApplications(defaultRootPath, rootPath, contextPath)
+	} else {
+		files, err := ioutil.ReadDir(rootPath)
+		if err != nil {
+			return err, nil
+		}
+
+		for _, f := range files {
+			if f.IsDir() {
+
+				config.Applications = AppendSliceIfMissing(config.Applications, NewHwcApplications(defaultRootPath , filepath.Join(rootPath, f.Name()),contextPath + f.Name()))
+			}
+		}
+	}
 	config.ApplicationHostConfigPath = filepath.Join(configPath, "ApplicationHost.config")
 	config.AspnetConfigPath = filepath.Join(configPath, "Aspnet.config")
 	config.WebConfigPath = filepath.Join(configPath, "Web.config")

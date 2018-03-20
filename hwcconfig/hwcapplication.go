@@ -39,3 +39,21 @@ func removeLastSegmentFromPath(path string) string {
 	}
 	return "/"
 }
+
+func AppendIfMissing(slice []*HwcApplication, i *HwcApplication) []*HwcApplication {
+	for _, ele := range slice {
+		if ele.Path == i.Path {
+			return slice
+		}
+	}
+	return append(slice, i)
+}
+
+func AppendSliceIfMissing(slice []*HwcApplication, addedSlice []*HwcApplication) []*HwcApplication {
+	var resultSlice []*HwcApplication;
+	resultSlice = slice;
+	for _, ele := range addedSlice {
+		resultSlice = AppendIfMissing(resultSlice, ele)
+}
+return resultSlice;
+}

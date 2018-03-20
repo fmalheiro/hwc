@@ -23,9 +23,11 @@ import (
 )
 
 var appRootPath string
+var multipleApps bool
 
 func init() {
 	flag.StringVar(&appRootPath, "appRootPath", ".", "app web root path")
+	flag.BoolVar(&multipleApps, "multipleApps", false, "root path is a collection of multiples apps ")
 }
 
 func main() {
@@ -69,7 +71,7 @@ func main() {
 		checkErr(fmt.Errorf("Generating UUID: %v", err))
 	}
 
-	err, config := hwcconfig.New(port, rootPath, tmpPath, contextPath, uuid)
+	err, config := hwcconfig.New(port, rootPath, tmpPath, contextPath, uuid, multipleApps)
 	checkErr(err)
 
 	err, wc := webcore.New()
